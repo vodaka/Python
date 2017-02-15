@@ -1,0 +1,4 @@
+# Print search path in Python3
+import sys
+for place in sys.path:
+  print(place)
