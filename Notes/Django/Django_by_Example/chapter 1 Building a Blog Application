@@ -1,0 +1,87 @@
+# Installation
+
+	pip install django
+	
+	#distribution-specific pakage
+	tar 
+	cd 
+	python3 setup.py install
+	
+# Create a project
+
+	django-admin / django-admin.py startproject mysite
+	
+	# after the command , a directory called mysite was create ,that is the project name, and it contains another directory 
+	# named mysite , this mysite contains four flies for the project settings and this mysite is not the real app , for install
+	# blog. The app directory is create under the project directory , parallelling with mysite configuration directory.
+	
+# Inorder to deploy django in a production environment, you should run it as a Web Server Gateway Interface (WSGI) application
+# using a real web server such as Apache , Gunicorn or uWSGI . More information about how to deploy django with different web
+# servers at https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/
+
+# Project Setttings
+
+	open settings.py file:
+	
+	DEBUG : True / False . Remember set it to False when move to production environment.
+	
+	ALLOWED_HOSTS : is not applied while debug mode is on . Once DEBUG set to False , you have to add your domain/hosts
+	to this setting to allow it to server Django site.
+	
+	INSTALLED_APPS : is a setting you have to edit in all projects .  This setting tells django which applications are active
+	for this site.
+	
+	MIDDLEWARE_CLASSES :is a tuple containing middlewares to be executed.
+	
+	ROOT_URLCONF : indicates the Python module where your root URL patterns of your application are defined.
+	
+	DATABASES is a directory containing settings for all databases to be used in the project.
+	
+	LAGUANGE_CODE defines the default laguage code for the django site.
+	
+# Projects and Applications
+	in Django
+	Project is considered as a Django installation with some settings;
+	Application is a group of models , views , templates and URLs.
+	You can think of project as your website , which contains serveral applications like blog, wiki , or forum which can be
+	used in other projects.
+# Create an Application
+	# from your project's root directory , run the following command:
+	python3 manager.py startapp blog
+	# This will create the basic structure of the application
+		admin.py--
+		migrations
+		models.py --- data model of your application . All Django application need to have a models.py file , but this file
+			can be left emputy.
+		tests.py --- add test for your application
+		views.py --- The logic of your application goes here . Each view receives a HTTP request , processing it , and 
+			returns a reponse.
+# Designing the blog data schema
+
+	# Define the initial data model for our blog
+	# A model is a Python class that subclasses django.db.modles.MODEL , in which each attribute reprents a database field.
+	# Django will create a table for each model defined in models.py file.
+	# When you create a model , django offers you a practical API to querry the database easily.
+	# First , we wil define a post model . Adding the following lines to models.py file of blog application.
+	from django.db import models
+	from django.utils import timezone
+	from django.contrib.auth.models import User
+	
+	class Post(models.MODEL):
+		STATUS_CHOICE = (('draft','Draft'),('published','Published'))
+		title = models.CharField(max_length = 250)
+		slug = models.SlugField(max_lenght = 250,unique_for_date = 'publish')
+		author = models.ForeignKey(User,related_name = 'blog_posts')
+		body = models.TextField()
+		publish = models.DateTimeField(default = timezone.now)
+		created = models.DateTimeField(auto_now_add=True)
+		updated = models.DateTimeField(auto_now=True)
+		status = CharField(max_length=10,status=STATUS_CHOICE,default='draft')
+		class Meta:
+			ordering = ('_publish',)
+		def __str__(self):
+			return self.title
+
+	
+	
+	
