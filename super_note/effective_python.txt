@@ -1,0 +1,191 @@
+                chapter 1 用Pythonic方式来思考
+    一门语言的编程习惯是由用户来确定的。pythonic风格既不是非常严密的规范，
+    也不是有编译器强加给开发者的规则，而是大家在使用Python语言协同工作的
+    过程中逐渐形成的习惯。
+
+第1条 确认自己所用的Python版本
+        
+    本书大部分范例代码都遵循Python3.4的语法，某些范例还会同时给出Python2.7
+    版本代码，以强调两者的区别。
+
+第2条 遵循PEP8风格指南
+    
+    空白：
+        - 使用space（空格）来表示缩进，而不要使用tab;
+        - 和语法相关的每一层缩进都用4个空格
+        - 每行的字符数不应超过79
+        - 对于占据多行的长表达式来说，除了首行之外的其余各行都应该在通常
+          缩进级别上再加4个空格。
+        - 文件中的函数与类之间应该用两个空行隔开；
+        - 在同一个类中，各方法之间应该用一个空行隔开；
+        - 在使用下表来获取列表元素、调用函数或给关键字参数赋值的时候，不要
+          在两旁添加空格；
+        - 为变量赋值的时候，赋值符号的左侧和右侧应该各自协商一个空格，而且
+          只有一个就好；
+
+    命名：
+        - 函数、变量及属性应该用小写字母来拼写，各单词之间以下划线相连，
+          如，lowercase_underscore。
+        - 受保护的实例属性，应该以单个下划线开头，例如，_leading_underscore
+        - 私有的实例属性，应该以两个下划线开头，__double_leading_underscore
+        - 类与异常，应该以每个单词首字母均大写的形式来命名，CapitalizedWord
+        - 模块级别的敞亮，应该采用全部大写字母来拼写，个单词之间以下划线
+          相连，如，ALL_CAPS
+        - 类中的实例方法（instance method)，应该把首个参数命名为self,以表示
+          该对象自身
+        - 类方法(class method)的首个参数应该命名为cls，表示该类自身
+
+    表达式和语句：
+        - 采用内联形式的否定词，二不要把否定词放在整个表达式的前面，如
+          if a is not b ---- recommanded
+          if not a is b ---- not recommanded
+        - 不要通过检测长度的办法(如if len(somelist) == 0)来判断somelist是否
+          为[]或''(字符串)等空值，而是应该采用if not somelist这种写法来判断
+          它会假定：空值将自动评估为False
+        - 检测somelist是否为[1]或'hi'等非空值时，也应如此，if somelist会
+          默认把非空大值判断为True
+        - 不要编写单行的if语句、for循环、while循环及expect复合语句，而是应
+          该把这些语句分成多行来书写，以示清晰
+        - import语句应该总是放在文件开头
+        - 引入模块的时候，总是应该使用绝对名称，而不应该根据当前模块的路径
+          来使用相对名称。如，引入bar包中的foo模块时，应该完整地写出
+          from bar import foo，而不应该简写为import foo
+        - 如果一定要以相对名称来编写import语句，应采用明确的写法:
+          from . import foo
+        - 文件中的import语句应该按顺序分成三个部分，分别表示标准库模块、
+          第三方模块以及自用模块。在每一部分中，个import语句应该按该模块
+          的字母顺序来排列。
+
+第3条 了解bytes、str与unicode的区别
+
+    Python3有两种表示字符序列的类型：
+        - bytes : 实例包含原始的8位值；
+        - str： 实例包含Unicode字符；
+    Python2，也有两种表示字符序列的类型：
+        - str：实例包含原始的8位值；
+        - unicode:实例包含Unicode；
+    把Unicode字符表示为二进制数据(也就是原始8位值)有许多方法。最常见的编码
+    方式就是UTF-8.但是Python3的str实例和Python2的unicode实例都没有和特定的
+    二进制编码形式相关联。要把Unicode字符转换成二进制数据，就必须使用
+    encode方法。要想把二进制数据转换成Unicode字符，就必须使用decode方法。
+
+    编写Python程序的时候，一定要把解码和编码操作放在界面的最外围来做。程序
+    的核心部分应该使用Unicode字符类型(也就是Python3中的str和Python2中的
+    Unicode)，而且不要对字符编码做任何假设。这种办法既可以令程序接受多种
+    类型的文本编码(如Latin-1\Shift JIS、Big5)，又可以保证输出的文本信息
+    值采用一种编码形式(最好是UTF-8).
+
+    编写两个辅助函数：
+        在Python3中，我们需要编写接受str或bytes，并总是返回str的方法：
+        def to_str(bytes_or_str):
+            if isinstance(bytes_or_str, bytes):
+                value = bytes_or_str.decode('uft-8')
+            else:
+                value = bytes_or_str
+            return value  # Instance of str
+        另外，还要编写接受str或bytes，并总是返回bytes的方法：
+        def to_bytes(bytes_or_str):
+            if isinstance(bytes_or_str, str):
+                value = bytes_or_str.encode('uft-8')
+            else:
+                value = bytes_or_str
+            return value  # Instance of bytes
+
+        在Python2中，需要编写接受str或unicode，并总是返回unicode的方法：
+
+        #Python2
+        def to_unicode(unicode_or_str):
+            if isinstance(unicode_or_str, str):
+                value = unicode_or_str.decode('utf-8')
+            else:
+                value = unicode_or_str
+            return value  # Instance of unicode
+
+        还需要编写接受str或unicode，并总是返回str的方法：
+
+        #Python2
+        def to_str(unicode_or_str):
+            if isinstance(unicode_or_str, unicode):
+                value = unicode_or_str.encode('utf-8')
+            else:
+                value = unicode_or_str
+            return value  # Instance of str
+ 
+
+第4条 用辅助函数取代复杂的表达式
+    - 开发者很容易过度使用Python的语法特性，从而写出复杂并难以理解的单行表达        式
+    - 应该把复杂的表达式移入辅助函数之中，如果要反复使用相同的逻辑，那就更应
+      该这么做
+    - 使用if/else表达式，要比用or或and这样的Boolean操作符写成的表达式更加
+      清晰
+
+第5条 了解切割序列的办法
+    - 切片操作:简洁
+        从列表开头获取切片，start位置留空，如： somelist[:5]
+        从列表切片一直取到末尾，end位置留空，如： somelist[5:]
+    - 切割列表时，即便start或end索引越界也不会出现问题，利用这一特性，可以
+      限定输入序列的最大长度：
+      first_twenty_items = a[:20]
+      last_twenty_items = a[-20:]
+      反之，访问列表中单个元素时，下标不能越界，否则会导致异常。
+
+第6条 尽量使用stride为整数，且不带start或end索引的切割操作。尽量避免用负数
+      做stride
+      在同一个切片操作内，不要同事使用start、end和stride。如果确实需要执行
+      这种操作，那就考虑将其拆解为两条赋值语句，其中一条做范围切割，另一条
+      做步进切割，或考虑使用内置iretools模块中的islice
+
+第7条 用列表推导来取代map和filter
+      
+第8条 不要使用含有两个以上表达式的列表推导
+        超过两个表达式的列表推导是很难理解的，应该尽量避免。
+
+第9条 用生成器表达式来改写数据量较大的列表推导（10000个元素）
+        
+        列表推导缺点：在推导过程中，对于输入序列的每个值，可能都要创建仅
+        含一项元素的全新列表。如果输入的数据非常多，可能会消耗大量内存，并
+        导致程序崩溃。
+        例如，要读取一份文件并返回每行的字符数。若采用列表推导，则需要把文
+        件每一行的长度都保存在内存中。如果文件特别大，或是通过无休止的
+        network socket(网络套接字)来读取，那么这种列表推导就会出现问题：
+        
+        value = [len(x) for x in open('/tmp/myfile.txt')] #只使用少量输入值
+        
+        为了解决此类问题，Python提供了生成器表达式(generator expression).
+        生成器表达式运行时，并不会把整个输出序列都呈现出来，而是会估值为
+        迭代器(iterator),这个迭代器每次可以根据生成器表达式产生一项数据。
+        把实现列表推导所用的那种写法放在一对圆括号中就构成了生成器表达式：
+
+        it = (len(x) for x in open('/tmp/my_file.txt'))
+
+        以上面的那个迭代器为参数，逐次调用内置的next函数，即可使其按照生成
+        器表达式输出下一个值：
+
+        print(next(it))
+
+        使用生成器表达式还有个好处，就是可以相互组合。下面的代码把刚才那个
+        生成器表达式所返回的迭代器作用到另一个生成器表达式的输入值：
+
+        roots = ((x, x**0.5) for x in it)
+        print(next(roots))
+
+        注意：由生成器表达式所返回的那个迭代器是有状态的，用过一轮之后
+        就不要反复使用了(参见第17条)
+
+第10条 尽量使用enumerate取代range
+        当迭代列表时，通常还想直到当前元素在列表中索引。一种办法是用range
+        for i in range(len(flavor_list)):
+            flavor = flavor_list[i]
+            print('%d: %s' % (i + 1, flavor))
+
+        Python提供了内置的enumerate函数，enumerate可以把各种迭代器包装成
+        生成器，仪表稍后产生输出值。
+        for i, flavor in enumerate(flavor_list):
+            print('%d: %s' % (i + 1, flavor))
+        还可一直接制定enumerate函数开始计数时使用的值。
+        for i, flavor in enumerate(flavor_list, 1):
+            print('%d: %s' % (i, flavor))
+
+
+        
+
